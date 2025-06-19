@@ -1,13 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
-import axios from "axios";
 import MessageItem from "./MessageItem";
 import { FaPaperPlane } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { BookOpenCheck, AlertCircle, Info, Sparkles } from "lucide-react";
 import { fetchChatMessages } from "../../services/api";
 
-const socket = io("http://localhost:8080", { withCredentials: true });
+const socket = io(import.meta.env.VITE_API_URL, { withCredentials: true });
 
 export default function GlobalChat({ currentUser }) {
   const [messages, setMessages] = useState([]);
