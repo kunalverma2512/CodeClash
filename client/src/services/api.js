@@ -1,19 +1,38 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-
 const BASE_URL = import.meta.env.VITE_API_URL;
 
-
+const wakeUpBackend = async () => {
+  try {
+    await fetch(`${BASE_URL}`);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 // ---------------------------Navbar API calls---------------------------
 // 1. Navbar Login Call via Google OAuth
 export const googleLogin = async () => {
-  window.location.href = `${BASE_URL}/auth/google?state=participant`;
+  const isAwake = await wakeUpBackend();
+  setTimeout(
+    () => {
+      window.location.href = `${BASE_URL}/auth/google?state=participant`;
+    },
+    isAwake ? 1200 : 3000
+  ); // buffer: 1.2s if awake, else 3s
 };
 // 2. Navbar Admin Login Call via Google OAuth
+// Login for admin
 export const googleAdminLogin = async () => {
-  window.location.href = `${BASE_URL}/auth/google?state=admin`;
+  const isAwake = await wakeUpBackend();
+  setTimeout(
+    () => {
+      window.location.href = `${BASE_URL}/auth/google?state=admin`;
+    },
+    isAwake ? 1200 : 3000
+  );
 };
 // 3. Navbar Logout Call
 export const logout = async () => {
@@ -81,7 +100,7 @@ export const codeforcesVerifyHandle = async (
 // ------------------------------ContestsList fetchProblems---------------------------
 export const fetchContests = async (setContests, setLoading) => {
   try {
-    const res = await axios.get(`${BASE_URL}/dashboard/contests`,{
+    const res = await axios.get(`${BASE_URL}/dashboard/contests`, {
       withCredentials: true,
     });
     const data = await res.data;
@@ -195,12 +214,9 @@ export const fetchCfSubmissions = async (setSubmissions, setLoading) => {
 // ------------------------------Fetch Submission Details---------------------------
 export const fetchSubmissionDetails = async (id, setSubmission, setLoading) => {
   try {
-    const res = await axios.get(
-      `${BASE_URL}/dashboard/submissions/${id}`,
-      {
-        withCredentials: true,
-      }
-    );
+    const res = await axios.get(`${BASE_URL}/dashboard/submissions/${id}`, {
+      withCredentials: true,
+    });
     setSubmission(res.data);
   } catch (err) {
     console.error("Failed to fetch submission:", err);
@@ -210,13 +226,17 @@ export const fetchSubmissionDetails = async (id, setSubmission, setLoading) => {
 };
 
 // ------------------------------Fetch CF Details---------------------------
-export const fetchCodeforcesDetails = async (handle,setcfInfo,setIsLoading) => {
+export const fetchCodeforcesDetails = async (
+  handle,
+  setcfInfo,
+  setIsLoading
+) => {
   try {
     const res = await axios.get(
       `https://codeforces.com/api/user.info?handles=${handle}`
     );
     setcfInfo(res.data.result[0]);
-  } catch{
+  } catch {
     toast.error("Error fetching Codeforces data");
   } finally {
     setIsLoading(false);
@@ -239,77 +259,86 @@ export const syncCodeforces = async () => {
   }
 };
 
-
 // ------------------------------Chat Fetch Messages---------------------------
 export const fetchChatMessages = async (setMessages, initialLoadDone) => {
   try {
-        const res = await axios.get(`${BASE_URL}/discussion/getAllMessages`,{
-          withCredentials: true,
-        });
-        setMessages(res.data);
-        initialLoadDone.current = true; // Mark initial load done
-      } catch (err) {
-        console.error("Failed to fetch messages", err);
-      }
-}
-
-
-
-// ------------------------------Doctor CP API calls---------------------------
-export const DoctorsubmitDiagnosis = async (complaint,checkboxes,routine,goals,mood,experience,hoursPerDay,platformIssues,setReport) => {
-  try {
-      const res = await axios.post(
-        `${BASE_URL}/api/doctor-cp/diagnose`,
-        {
-          complaint,
-          selected: Object.keys(checkboxes).filter((k) => checkboxes[k]),
-          routine,
-          goals,
-          mood,
-          experience,
-          hoursPerDay,
-          platformIssues,
-        },
-        { withCredentials: true }
-      );
-      setReport(res.data);
-      if(res){
-        toast.success("Diagnosis submitted successfully! please scroll down to see the report.");
-      }
-    } catch (err) {
-      toast.error(err);
-    }
+    const res = await axios.get(`${BASE_URL}/discussion/getAllMessages`, {
+      withCredentials: true,
+    });
+    setMessages(res.data);
+    initialLoadDone.current = true; // Mark initial load done
+  } catch (err) {
+    console.error("Failed to fetch messages", err);
+  }
 };
 
-
+// ------------------------------Doctor CP API calls---------------------------
+export const DoctorsubmitDiagnosis = async (
+  complaint,
+  checkboxes,
+  routine,
+  goals,
+  mood,
+  experience,
+  hoursPerDay,
+  platformIssues,
+  setReport
+) => {
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/api/doctor-cp/diagnose`,
+      {
+        complaint,
+        selected: Object.keys(checkboxes).filter((k) => checkboxes[k]),
+        routine,
+        goals,
+        mood,
+        experience,
+        hoursPerDay,
+        platformIssues,
+      },
+      { withCredentials: true }
+    );
+    setReport(res.data);
+    if (res) {
+      toast.success(
+        "Diagnosis submitted successfully! please scroll down to see the report."
+      );
+    }
+  } catch (err) {
+    toast.error(err);
+  }
+};
 
 // ------------------------------Admin Dashboard API calls---------------------------
-export const handleCreateContest = async (contest,user,navigate) => {
+export const handleCreateContest = async (contest, user, navigate) => {
   try {
-        const contestData = {
-          ...contest,
-          tags : contest.tags.split(",").map((tag)=> tag.trim()),
-          createdBy: user._id ,
-          problems : contest.problems.map((problem) => ({
-            ...problem,
-            createdBy: user._id,
-            tags: contest.tags.split(",").map((tag)=>tag.trim()),
-          }))
-        }
-        const response = await axios.post(`${BASE_URL}/admin-dashboard/contests/create-contest`, contestData,{
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-        if(response){
-          toast.success("Contest created successfully!");
-        }
-        navigate("/admin-dashboard");
-        
-        
-      } catch (error) {
-        console.error("Error creating contest:", error.response?.data || error);
-        alert("Failed to create contest.");
+    const contestData = {
+      ...contest,
+      tags: contest.tags.split(",").map((tag) => tag.trim()),
+      createdBy: user._id,
+      problems: contest.problems.map((problem) => ({
+        ...problem,
+        createdBy: user._id,
+        tags: contest.tags.split(",").map((tag) => tag.trim()),
+      })),
+    };
+    const response = await axios.post(
+      `${BASE_URL}/admin-dashboard/contests/create-contest`,
+      contestData,
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
-}
+    );
+    if (response) {
+      toast.success("Contest created successfully!");
+    }
+    navigate("/admin-dashboard");
+  } catch (error) {
+    console.error("Error creating contest:", error.response?.data || error);
+    alert("Failed to create contest.");
+  }
+};
