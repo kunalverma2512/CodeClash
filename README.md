@@ -14,7 +14,7 @@
 - 📊 **View All Submissions** with details
 - 👤 **User Profile Section**
 - 💬 **Global Discussion Chat** using WebSockets (Socket.io)
-- 🧠 **Doctor CP** – Get AI-driven feedback on your practice habits (no ML used, rule-based diagnosis)
+- 🧠 **Doctor CP** – Get AI-driven feedback on your practice habits using Gemini API
 
 ---
 
