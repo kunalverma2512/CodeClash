@@ -18,7 +18,7 @@ authRouter.get("/google/callback", (req, res, next) => {
       // ❌ If there's a role conflict or user is not found
 
       return res.redirect(
-        "http://localhost:5173/admin-login-error"
+        `${process.env.CLIENT_URL}/admin-login-error`
       );
 
       // return res.redirect(
@@ -33,9 +33,9 @@ authRouter.get("/google/callback", (req, res, next) => {
 
       // Redirect based on role
       if (user.role === "admin") {
-        return res.redirect("http://localhost:5173/admin-dashboard");
+        return res.redirect(`${process.env.CLIENT_URL}/admin-dashboard`);
       } else {
-        return res.redirect("http://localhost:5173/dashboard");
+        return res.redirect(`${process.env.CLIENT_URL}/dashboard`);
       }
     });
   })(req, res, next);
@@ -44,7 +44,7 @@ authRouter.get("/google/callback", (req, res, next) => {
 authRouter.get("/logout", (req, res) => {
   req.logout((err) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.redirect("http://localhost:5173");
+    res.redirect(`${process.env.CLIENT_URL}`);
   });
 });
 
