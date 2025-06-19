@@ -6,6 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { ToastContainer } from 'react-toastify';
 import AppWrapper from "./AppWrapper.jsx";
+import 'flowbite';
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
