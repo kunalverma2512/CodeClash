@@ -1,9 +1,11 @@
 import React from "react";
+import { googleLogin } from "../../services/api";
 // import { useNavigate } from 'react-router-dom'
 
 const GetLogin = ({ onClose }) => {
     const handleGetLogin = () => {
-      window.location.href = "http://localhost:8080/auth/google";
+      // window.location.href = "http://localhost:8080/auth/google";
+      googleLogin();
     };
   
     return (
