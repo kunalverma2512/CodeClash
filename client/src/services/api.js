@@ -113,11 +113,10 @@ export const fetchContests = async (setContests, setLoading) => {
 };
 
 export const fetchCodeforcesProblems = async () => {
-  const response = await fetch(
+  const response = await axios.get(
     `https://codeforces.com/api/problemset.problems?lang=en`
   );
-  const data = await response.json();
-  return data.result.problems; // return full list of problems
+  return response.data.result.problems; // return full list of problems
 };
 
 // Fetch a single contest by ID
