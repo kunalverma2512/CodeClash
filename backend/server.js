@@ -3,7 +3,7 @@ import http from "http";
 import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
-import { Server } from 'socket.io';
+import { Server } from "socket.io";
 import connectDB from "./config/mongodb.js";
 import passport from "./config/passport.js";
 import authRouter from "./routes/authRoutes.js";
@@ -27,7 +27,6 @@ const io = new Server(server, {
   },
 });
 
-
 const PORT = process.env.PORT || 4000;
 
 connectDB();
@@ -46,23 +45,25 @@ app.use(
     secret: process.env.COOKIE_KEY,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      secure: true, // required for HTTPS (Render)
+      sameSite: "none", // allow cross-site cookie for Vercel <-> Render
+    },
   })
 );
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-
 app.use("/auth", authRouter);
-app.use("/dashboard",contestRouter);
-app.use("/dashboard/submissions",submissionRouter);
-app.use("/codeforces-link",codeForcesRouter);
+app.use("/dashboard", contestRouter);
+app.use("/dashboard/submissions", submissionRouter);
+app.use("/codeforces-link", codeForcesRouter);
 app.use("/cf-problems", cfProblemsRouter);
-app.use("/api/ai",AIRouter)
-app.use("/admin-dashboard", adminRouter )
+app.use("/api/ai", AIRouter);
+app.use("/admin-dashboard", adminRouter);
 app.use("/discussion", chatRouter);
-app.use("/api/doctor-cp",doctorCPRouter)
+app.use("/api/doctor-cp", doctorCPRouter);
 
 /**
  * SOCKET.IO CONNECTION HANDLING
@@ -89,7 +90,10 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", async ({ content, sender }) => {
     try {
       const savedMsg = await saveMessage(content, sender);
-      const populatedMsg = await savedMsg.populate("sender", "name profilePicture _id");
+      const populatedMsg = await savedMsg.populate(
+        "sender",
+        "name profilePicture _id"
+      );
       io.emit("receiveMessage", populatedMsg); // broadcast to all
     } catch (err) {
       console.error("❌ Message saving failed:", err);
@@ -107,8 +111,6 @@ io.on("connection", (socket) => {
     io.emit("updateOnlineUsers", Array.from(onlineUsers.values()));
   });
 });
-
-
 
 // Start listening
 server.listen(PORT, () => {
