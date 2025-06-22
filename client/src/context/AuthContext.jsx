@@ -3,6 +3,8 @@ import axios from "axios";
 import LoadingScreen from "../components/UI/LoadingScreen";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -12,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/auth/user", { withCredentials: true });
+        const res = await axios.get(`${API_URL}/auth/user`, { withCredentials: true });
         setUser(res.data);
       } catch (error) {
         toast.error("Authentication failed. Please log in again.");
