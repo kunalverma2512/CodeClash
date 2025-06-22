@@ -36,6 +36,9 @@ const corsOptions = {
   credentials: true,
 };
 
+// ✅ Tell Express to trust reverse proxy
+app.set("trust proxy", 1); 
+
 // middleware
 app.use(cors(corsOptions));
 
