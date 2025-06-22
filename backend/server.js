@@ -51,6 +51,7 @@ app.use(
     cookie: {
       secure: true, // required for HTTPS (Render)
       sameSite: "none", // allow cross-site cookie for Vercel <-> Render
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
     },
   })
 );

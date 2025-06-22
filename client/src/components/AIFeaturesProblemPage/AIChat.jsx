@@ -89,7 +89,7 @@ const AiChat = ({ code, language }) => {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/ai/problem/chat",
+        `${import.meta.env.VITE_API_URL}/api/ai/problem/chat`,
         {
           messages: updatedMessages,
           code,
